@@ -29,5 +29,6 @@ class MainActivity : AppCompatActivity() {
         pictureView = findViewById(R.id.picture)
         titleTextView = findViewById(R.id.title)
         dateTextView = findViewById(R.id.date)
+        var response = apodApi.getData(API_KEY)
     }
 }
