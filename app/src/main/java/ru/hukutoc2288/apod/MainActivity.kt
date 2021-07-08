@@ -28,6 +28,7 @@ lateinit var dateTextView: TextView
 lateinit var model: MainModel
 lateinit var pictureLoader: ProgressBar
 lateinit var descriptionTextView: TextView
+lateinit var dateFormat: SimpleDateFormat
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,36 +43,59 @@ class MainActivity : AppCompatActivity() {
         dateTextView = findViewById(R.id.date)
         pictureLoader = findViewById(R.id.image_loader)
         descriptionTextView = findViewById(R.id.description)
-
-        val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
+        dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
 
         var response = apodApi.getToday().enqueue(object : Callback<ApodEntry> {
-            override fun onResponse(call: Call<ApodEntry>?, response: Response<ApodEntry>?) {
-                val entry = response!!.body()
-                if (DateUtils.isToday(entry.date.time)) {
-                    dateTextView.text = getString(R.string.date_today)
-                } else {
-                    dateTextView.text = dateFormat.format(entry.date)
-                }
-                titleTextView.text = entry.title
-                descriptionTextView.text = entry.explanation
-
-                Picasso.get().load(entry.url).into(pictureView, object : com.squareup.picasso.Callback {
-                    override fun onSuccess() {
-                        pictureView.visibility = View.VISIBLE
-                        pictureLoader.visibility = View.GONE
-                    }
-
-                    override fun onError(e: Exception?) {
-
-                    }
-                })
+            override fun onResponse(call: Call<ApodEntry>, response: Response<ApodEntry>) {
+                if (!response.isSuccessful)
+                    return
+                val entry = response.body()
+                inflateViewsWithResponse(entry)
             }
 
             override fun onFailure(call: Call<ApodEntry>?, t: Throwable) {
                 t.printStackTrace()
             }
 
+        })
+    }
+
+    fun onFabClick(view: View) {
+        var response = apodApi.getRandom().enqueue(object : Callback<List<ApodEntry>> {
+            override fun onResponse(call: Call<List<ApodEntry>>, response: Response<List<ApodEntry>>) {
+                if (!response.isSuccessful)
+                    return
+                val entry = response.body()
+                if (entry.isNotEmpty())
+                    inflateViewsWithResponse(entry[0])
+            }
+
+            override fun onFailure(call: Call<List<ApodEntry>>?, t: Throwable) {
+                t.printStackTrace()
+            }
+        })
+    }
+
+    fun inflateViewsWithResponse(entry: ApodEntry) {
+        pictureView.visibility = View.GONE
+        pictureLoader.visibility = View.VISIBLE
+        if (DateUtils.isToday(entry.date.time)) {
+            dateTextView.text = getString(R.string.date_today)
+        } else {
+            dateTextView.text = dateFormat.format(entry.date)
+        }
+        titleTextView.text = entry.title
+        descriptionTextView.text = entry.explanation
+
+        Picasso.get().load(entry.url).into(pictureView, object : com.squareup.picasso.Callback {
+            override fun onSuccess() {
+                pictureView.visibility = View.VISIBLE
+                pictureLoader.visibility = View.GONE
+            }
+
+            override fun onError(e: Exception?) {
+
+            }
         })
     }
 }

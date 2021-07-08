@@ -6,7 +6,6 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
         tools:context=".MainActivity"
         >
 
@@ -14,42 +13,35 @@
             android:id="@+id/main.appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
 
             >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:contentScrim="?attr/colorPrimary"
-                app:expandedTitleGravity="top"
-                app:expandedTitleMarginStart="48dp"
-                app:expandedTitleMarginEnd="64dp"
+                android:layout_height="wrap_content"
                 app:layout_scrollFlags="scroll|enterAlways|snap"
                 >
 
             <androidx.appcompat.widget.Toolbar
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_height="wrap_content"
                     android:id="@+id/toolbar"
-                    android:elevation="16dp"
+                    android:layout_marginLeft="-16dp"
+                    android:layout_marginStart="-16dp"
                     >
 
                 <LinearLayout
-                        android:gravity="center"
                         android:orientation="vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:padding="8dp"
                         >
 
                     <TextView
-                            app:layout_constraintBottom_toTopOf="@id/date"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Toolbar Title"
-                            android:gravity="center"
+                            android:gravity="center_horizontal"
                             android:id="@+id/title"
                             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                             android:textColor="?android:attr/textColorPrimary"
@@ -58,11 +50,8 @@
                     <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Toolbar Title"
-                            android:gravity="center"
-                            app:layout_constraintTop_toBottomOf="@id/title"
+                            android:gravity="center_horizontal"
                             android:id="@+id/date"
-                            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
                             />
                 </LinearLayout>
             </androidx.appcompat.widget.Toolbar>
@@ -90,6 +79,7 @@
                     app:layout_constraintRight_toRightOf="parent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     />
 
             <ImageView
@@ -100,7 +90,7 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toBottomOf="@id/image_loader"
                     android:id="@+id/picture"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     />
 
             <TextView
@@ -109,6 +99,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/date_text_margin"
+                    android:text="Explanation: Aphelion for 2021 occurred on July 5th. That's the point in Earth's elliptical orbit when it is farthest from the Sun. Of course, the distance from the Sun doesn't determine the seasons. Those are governed by the tilt of Earth's axis of rotation, so July is still summer in the north and winter in the southern hemisphere. But it does mean that on July 5 the Sun was at its smallest apparent size when viewed from planet Earth. This composite neatly compares two pictures of the Sun, both taken with the same telescope and camera. The left half was captured close to the date of the 2021 perihelion (January 2), the closest point in Earth's orbit. The right was recorded just before the aphelion in 2021. Otherwise difficult to notice, the change in the Sun's apparent diameter between perihelion and aphelion amounts to a little over 3 percent."
                     />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
@@ -121,5 +112,6 @@
             android:layout_margin="@dimen/fab_margin"
             android:layout_gravity="end|bottom"
             app:layout_behavior=".FabScrollBehavior"
+            android:onClick="onFabClick"
             />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
