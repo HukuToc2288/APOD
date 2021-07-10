@@ -80,6 +80,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="visible"
+                    android:onClick="onPictureClick"
                     />
 
             <ImageView
@@ -90,6 +91,7 @@
                     app:layout_constraintTop_toBottomOf="@id/image_loader"
                     android:id="@+id/picture"
                     android:visibility="gone"
+                    android:onClick="onPictureClick"
                     />
 
             <TextView
