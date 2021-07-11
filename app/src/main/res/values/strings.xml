@@ -2,6 +2,16 @@
     <string name="app_name">APOD</string>
     <string name="date_today">Today</string>
     <string name="title_activity_image_view">FullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="download">Download</string>
+    <string name="share">Share</string>
+    <string name="share_picture_title">Share picture link</string>
+    <string name="share_picture_message">Want to show you astronomy picture of the day – %s: https://apod.nasa.gov/apod/ap%s.html</string>
+    <string name="permission_storage_denied">Picture cannot be downloaded as you denied storage permission</string>
+    <string name="permission_storage_dialog_title">Please grant storage permissions!</string>
+    <string name="permission_storage_dialog_text">To be able to download pictures you must give storage permission
+        on the next dialog as all downloaded pictures go to storage. APOD will never touch any other files in storage.</string>
+    <string name="permission_storage_dialog_confirm">Got it</string>
+    <string name="permission_storage_never_again">Picture cannot be downloaded as you denied storage permission.
+        You need to go to settings and allow storage permission if you want to download pictures</string>
+
 </resources>

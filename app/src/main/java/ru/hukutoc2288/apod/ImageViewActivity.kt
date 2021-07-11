@@ -1,32 +1,42 @@
 package ru.hukutoc2288.apod
 
-import androidx.appcompat.app.AppCompatActivity
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Dialog
+import android.app.DownloadManager
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
+import android.view.Menu
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.github.chrisbanes.photoview.OnScaleChangedListener
-import com.github.chrisbanes.photoview.PhotoView
+import androidx.core.app.ShareCompat
+import androidx.fragment.app.DialogFragment
 import com.squareup.picasso.Picasso
-import java.lang.Exception
+import permissions.dispatcher.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
+
+@RuntimePermissions
 class ImageViewActivity : AppCompatActivity() {
     private lateinit var fullscreenContent: FrameLayout
     private lateinit var fullscreenContentControls: ConstraintLayout
     private lateinit var descriptionTextView: TextView
     private lateinit var pictureView: ImageView
     private lateinit var pictureLoader: ProgressBar
+    private lateinit var toolbar: Toolbar
 
-    private val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
+    private val humanDateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
+    private val urlDateFormat = SimpleDateFormat("yyMMdd", Locale.getDefault())
+    private lateinit var entry: ApodEntry
 
     private val hideHandler = Handler()
 
@@ -88,16 +98,18 @@ class ImageViewActivity : AppCompatActivity() {
         descriptionTextView = findViewById(R.id.description)
         pictureView = findViewById(R.id.picture)
         pictureLoader = findViewById(R.id.image_loader)
+        toolbar = findViewById(R.id.toolbar)
 
+        setSupportActionBar(toolbar)
         pictureView.setOnClickListener {
             toggle()
         }
-
-        val entry = intent.getParcelableExtra<ApodEntry>(APOD_ENTRY_EXTRA_KEY)!!
-        val titleString = if (entry.title != null) entry.title+"\n" else ""
-        val dateString = if (entry.date != null) dateFormat.format(entry.date)+"\n" else ""
+        entry = intent.getParcelableExtra<ApodEntry>(APOD_ENTRY_EXTRA_KEY)!!
+        //val titleString = if (entry.title != null) entry.title + "\n" else ""
+        val dateString = if (entry.date != null) humanDateFormat.format(entry.date!!) + "\n" else ""
         val copyrightString = entry.copyright ?: ""
-        descriptionTextView.text = titleString+dateString+copyrightString
+        descriptionTextView.text = dateString + copyrightString
+        supportActionBar?.title = entry.title
 
         Picasso.get().load(entry.url).into(pictureView, object : com.squareup.picasso.Callback {
             override fun onSuccess() {
@@ -110,6 +122,32 @@ class ImageViewActivity : AppCompatActivity() {
 
             }
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+// Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.picture_view, menu);
+        return true;
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_share -> ShareCompat.IntentBuilder(this)
+                .setType("text/plain")
+                .setChooserTitle(getString(R.string.share_picture_title))
+                .setText(
+                    getString(R.string.share_picture_message).format(
+                        entry.title,
+                        urlDateFormat.format(entry.date!!)
+                    )
+                )
+                .startChooser()
+            R.id.action_download ->
+                // TODO: huku 12.07.2021 process storage permission without this dumb library
+                if (entry.url != null)
+                    downloadImageWithPermissionCheck(entry.url!!)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -145,7 +183,7 @@ class ImageViewActivity : AppCompatActivity() {
         // Schedule a runnable to display UI elements after a delay
         hideHandler.removeCallbacks(hidePart2Runnable)
         hideHandler.postDelayed(showPart2Runnable, UI_ANIMATION_DELAY.toLong())
-       // delayedHide(AUTO_HIDE_DELAY_MILLIS)
+        // delayedHide(AUTO_HIDE_DELAY_MILLIS)
     }
 
     /**
@@ -176,4 +214,72 @@ class ImageViewActivity : AppCompatActivity() {
          */
         private const val UI_ANIMATION_DELAY = 300
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // NOTE: delegate the permission handling to generated method
+        onRequestPermissionsResult(requestCode, grantResults)
+    }
+
+    @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    fun downloadImage(url: String) {
+        val downloadReference: Long
+
+        // Create request for android download manager
+        val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+
+        val request = DownloadManager.Request(Uri.parse(url))
+        //Set the title of this download, to be displayed in notifications (if enabled).
+        request.setTitle("Downloading")
+        //Set a description of this download, to be displayed in notifications (if enabled)
+        request.setDescription("Downloading File")
+        //Set the local destination for the downloaded file to a path within the application's external files directory
+        request.setDestinationInExternalPublicDir(
+            Environment.DIRECTORY_DOWNLOADS,
+            url.substring(url.lastIndexOf('/') + 1)
+        )
+        request.setShowRunningNotification(true)
+        downloadReference = downloadManager.enqueue(request)
+    }
+
+
+    @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    fun showRationaleForStorage(request: PermissionRequest) {
+        RationaleDialogFragment().show(supportFragmentManager, "rationaleDialog")
+        request.proceed()
+    }
+
+    @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    fun onCameraNeverAskAgain() {
+        Toast.makeText(this, R.string.permission_storage_never_again, Toast.LENGTH_SHORT).show()
+    }
+
+    class RationaleDialogFragment : DialogFragment() {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            return activity?.let {
+                val builder = AlertDialog.Builder(it)
+                builder.setTitle(getString(R.string.permission_storage_dialog_title))
+                    .setMessage(getString(R.string.permission_storage_dialog_text))
+                    .setPositiveButton(getString(R.string.permission_storage_dialog_confirm)) { dialog, id ->  dialog.cancel()
+                    }
+                builder.create()
+            } ?: throw IllegalStateException("Activity cannot be null")
+        }
+    }
+
+
+
+//    class rationaleDialogFragment : DialogFragment() {
+//        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+//            return activity?.let {
+//                val builder = AlertDialog.Builder(it)
+//                builder.setTitle(getString(R.string.permission_storage_dialog_title))
+//                    .setMessage(getString(R.string.permission_storage_dialog_text))
+//                    .setPositiveButton("ОК, иду на кухню") {
+//                            dialog, id ->  dialog.cancel()
+//                    }
+//                builder.create()
+//            } ?: throw IllegalStateException("Activity cannot be null")
+//        }
+//    }
 }

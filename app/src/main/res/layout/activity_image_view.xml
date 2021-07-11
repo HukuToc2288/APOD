@@ -17,27 +17,30 @@
             android:focusable="true"
             android:id="@+id/fullscreen_content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            >
+
         <ProgressBar
                 android:clickable="false"
                 android:id="@+id/image_loader"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-    <com.github.chrisbanes.photoview.PhotoView
-            android:clickable="false"
-            android:id="@+id/picture"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:keepScreenOn="true"
-            android:textColor="#33b5e5"
-            android:textStyle="bold"
-            android:textSize="50sp"
-            android:gravity="center"
-            android:src="@mipmap/example"
-            android:visibility="invisible"
-            />
+                android:layout_height="wrap_content"
+                />
 
+        <com.github.chrisbanes.photoview.PhotoView
+                android:clickable="false"
+                android:id="@+id/picture"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:keepScreenOn="true"
+                android:textColor="#33b5e5"
+                android:textStyle="bold"
+                android:textSize="50sp"
+                android:gravity="center"
+                android:src="@mipmap/example"
+                android:visibility="invisible"
+                />
     </FrameLayout>
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
@@ -47,12 +50,21 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             >
+
+
+        <androidx.appcompat.widget.Toolbar
+                app:layout_constraintTop_toTopOf="parent"
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                />
         <TextView
                 android:id="@+id/description"
                 android:text="ъеъ"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
