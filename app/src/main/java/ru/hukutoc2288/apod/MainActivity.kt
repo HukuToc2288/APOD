@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -33,10 +34,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var pictureLoader: ProgressBar
     lateinit var descriptionTextView: TextView
     lateinit var dateFormat: SimpleDateFormat
-    lateinit var toolbar: androidx.appcompat.widget.Toolbar
+    lateinit var toolbar: Toolbar
 
     // for debugging purposes as internet connection is limited
-// 09.07.2021 huku
+    // 09.07.2021 huku
     var shouldLoadImages = true
     lateinit var currentDisplayingEntry: ApodEntry
 
@@ -118,7 +119,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onPictureClick(view: View) {
-        val intent = Intent(this,ImageViewActivity::class.java)
+        val intent = Intent(this, ImageViewActivity::class.java)
         intent.putExtra(APOD_ENTRY_EXTRA_KEY, currentDisplayingEntry)
         startActivity(intent)
     }

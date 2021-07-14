@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rationale_dialog_confirm">Got it</string>
+    <string name="never_again_dialog_go_settings">Go to settings</string>
+    <string name="never_again_dialog_go_dismiss">I understand</string>
+</resources>

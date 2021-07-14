@@ -11,7 +11,9 @@
     <string name="permission_storage_dialog_text">To be able to download pictures you must give storage permission
         on the next dialog as all downloaded pictures go to storage. APOD will never touch any other files in storage.</string>
     <string name="permission_storage_dialog_confirm">Got it</string>
-    <string name="permission_storage_never_again">Picture cannot be downloaded as you denied storage permission.
-        You need to go to settings and allow storage permission if you want to download pictures</string>
+    <string name="permission_storage_never_again">You denied storage permission, so now pictures cannot be downloaded.
+        If you want to download picture need to go to settings and allow storage permission manually.</string>
+    <string name="permissions_go_settings">Go to settings</string>
+    <string name="permissions_never_ask_dialog_confirm">I understand</string>
 
 </resources>

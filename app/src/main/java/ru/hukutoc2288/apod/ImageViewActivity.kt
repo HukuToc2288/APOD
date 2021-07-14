@@ -2,7 +2,6 @@ package ru.hukutoc2288.apod
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.app.DownloadManager
 import android.net.Uri
 import android.os.Bundle
@@ -13,19 +12,17 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ShareCompat
-import androidx.fragment.app.DialogFragment
 import com.squareup.picasso.Picasso
-import permissions.dispatcher.*
+import ru.hukutoc2288.simplepermissionsdispatcher.SimpleNeverAskDialogFragment
+import ru.hukutoc2288.simplepermissionsdispatcher.SimplePermissionsDispatcher
+import ru.hukutoc2288.simplepermissionsdispatcher.SimpleRationaleDialogFragment
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-@RuntimePermissions
 class ImageViewActivity : AppCompatActivity() {
     private lateinit var fullscreenContent: FrameLayout
     private lateinit var fullscreenContentControls: ConstraintLayout
@@ -40,6 +37,31 @@ class ImageViewActivity : AppCompatActivity() {
 
     private val hideHandler = Handler()
 
+    private val storagePermissionDispatcher =
+        object : SimplePermissionsDispatcher(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+            override fun onPermissionDenied() {
+                Toast.makeText(applicationContext, R.string.permission_storage_denied, Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onNeverAskAgain() {
+                //Toast.makeText(applicationContext, R.string.permission_storage_never_again, Toast.LENGTH_SHORT).show()
+                SimpleNeverAskDialogFragment(
+                    this,
+                    getString(R.string.permission_storage_dialog_title),
+                    getString(R.string.permission_storage_never_again)
+                ).show(supportFragmentManager, "neverAgainDialog")
+            }
+
+            override fun onShowRationale() {
+                SimpleRationaleDialogFragment(
+                    this,
+                    getString(R.string.permission_storage_dialog_title),
+                    getString(R.string.permission_storage_dialog_text)
+                ).show(supportFragmentManager, "rationaleDialog")
+            }
+
+        }
+
     @SuppressLint("InlinedApi")
     private val hidePart2Runnable = Runnable {
         // Delayed removal of status and navigation bar
@@ -51,9 +73,9 @@ class ImageViewActivity : AppCompatActivity() {
             View.SYSTEM_UI_FLAG_LOW_PROFILE or
                     View.SYSTEM_UI_FLAG_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
     }
     private val showPart2Runnable = Runnable {
         // Delayed display of UI elements
@@ -145,7 +167,9 @@ class ImageViewActivity : AppCompatActivity() {
             R.id.action_download ->
                 // TODO: huku 12.07.2021 process storage permission without this dumb library
                 if (entry.url != null)
-                    downloadImageWithPermissionCheck(entry.url!!)
+                    storagePermissionDispatcher.executeWithPermission(this) {
+                        downloadImage(entry.url!!)
+                    }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -218,10 +242,9 @@ class ImageViewActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         // NOTE: delegate the permission handling to generated method
-        onRequestPermissionsResult(requestCode, grantResults)
+        storagePermissionDispatcher.onRequestPermissionsResult(this, grantResults)
     }
 
-    @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
     fun downloadImage(url: String) {
         val downloadReference: Long
 
@@ -239,47 +262,7 @@ class ImageViewActivity : AppCompatActivity() {
             url.substring(url.lastIndexOf('/') + 1)
         )
         request.setShowRunningNotification(true)
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         downloadReference = downloadManager.enqueue(request)
     }
-
-
-    @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    fun showRationaleForStorage(request: PermissionRequest) {
-        RationaleDialogFragment().show(supportFragmentManager, "rationaleDialog")
-        request.proceed()
-    }
-
-    @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    fun onCameraNeverAskAgain() {
-        Toast.makeText(this, R.string.permission_storage_never_again, Toast.LENGTH_SHORT).show()
-    }
-
-    class RationaleDialogFragment : DialogFragment() {
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            return activity?.let {
-                val builder = AlertDialog.Builder(it)
-                builder.setTitle(getString(R.string.permission_storage_dialog_title))
-                    .setMessage(getString(R.string.permission_storage_dialog_text))
-                    .setPositiveButton(getString(R.string.permission_storage_dialog_confirm)) { dialog, id ->  dialog.cancel()
-                    }
-                builder.create()
-            } ?: throw IllegalStateException("Activity cannot be null")
-        }
-    }
-
-
-
-//    class rationaleDialogFragment : DialogFragment() {
-//        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-//            return activity?.let {
-//                val builder = AlertDialog.Builder(it)
-//                builder.setTitle(getString(R.string.permission_storage_dialog_title))
-//                    .setMessage(getString(R.string.permission_storage_dialog_text))
-//                    .setPositiveButton("ОК, иду на кухню") {
-//                            dialog, id ->  dialog.cancel()
-//                    }
-//                builder.create()
-//            } ?: throw IllegalStateException("Activity cannot be null")
-//        }
-//    }
 }

@@ -18,7 +18,6 @@
             >
         <activity
                 android:name=".ImageViewActivity"
-                android:configChanges="orientation|keyboardHidden|screenSize"
                 android:label="@string/title_activity_image_view"
                 >
         </activity>

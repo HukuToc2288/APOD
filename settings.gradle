@@ -1,2 +1,3 @@
+include ':APOD.SimplePermissionsDispatcher'
 include ':app'
 rootProject.name = "APOD"
