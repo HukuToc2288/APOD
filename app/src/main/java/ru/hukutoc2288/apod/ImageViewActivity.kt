@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ShareCompat
+import com.github.chrisbanes.photoview.PhotoView
 import com.squareup.picasso.Picasso
 import ru.hukutoc2288.apod.api.ApodEntry
 import ru.hukutoc2288.simplepermissionsdispatcher.SimpleNeverAskDialogFragment
@@ -28,7 +29,7 @@ class ImageViewActivity : AppCompatActivity() {
     private lateinit var fullscreenContent: FrameLayout
     private lateinit var fullscreenContentControls: ConstraintLayout
     private lateinit var descriptionTextView: TextView
-    private lateinit var pictureView: ImageView
+    private lateinit var pictureView: PhotoView
     private lateinit var pictureLoader: ProgressBar
     private lateinit var toolbar: Toolbar
 
@@ -74,9 +75,9 @@ class ImageViewActivity : AppCompatActivity() {
             View.SYSTEM_UI_FLAG_LOW_PROFILE or
                     View.SYSTEM_UI_FLAG_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
     }
     private val showPart2Runnable = Runnable {
         // Delayed display of UI elements
