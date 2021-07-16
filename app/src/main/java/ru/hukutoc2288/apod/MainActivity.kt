@@ -56,12 +56,8 @@ class MainActivity : AppCompatActivity() {
         dateTextView = findViewById(R.id.date)
         pictureLoader = findViewById(R.id.image_loader)
         descriptionTextView = findViewById(R.id.description)
-        toolbar = findViewById(R.id.toolbar)
         videoPlayButton = findViewById(R.id.youtube_play_button)
-
-        setSupportActionBar(toolbar)
         dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
-
         apodApi.getToday().enqueue(object : Callback<ApodEntry> {
             override fun onResponse(call: Call<ApodEntry>, response: Response<ApodEntry>) {
                 if (!response.isSuccessful)

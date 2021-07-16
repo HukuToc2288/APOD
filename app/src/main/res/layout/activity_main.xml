@@ -23,19 +23,14 @@
                 app:layout_scrollFlags="scroll|enterAlways|snap"
                 >
 
-            <androidx.appcompat.widget.Toolbar
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/toolbar"
-                    android:layout_marginLeft="-16dp"
-                    android:layout_marginStart="-16dp"
-                    >
 
                 <LinearLayout
+                        android:id="@+id/toolbar"
                         android:orientation="vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="8dp"
+                        app:elevation="4dp"
                         >
 
                     <TextView
@@ -54,7 +49,6 @@
                             android:id="@+id/date"
                             />
                 </LinearLayout>
-            </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
