@@ -1,10 +1,10 @@
 package ru.hukutoc2288.apod
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.format.DateUtils
-import android.transition.Visibility
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -17,7 +17,10 @@ import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import ru.hukutoc2288.apod.api.ApodEntry
+import ru.hukutoc2288.apod.api.MediaTypes
 import java.lang.Exception
+import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -57,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
 
-        var response = apodApi.getToday().enqueue(object : Callback<ApodEntry> {
+        var response = apodApi.getToday(date = "2021-07-14").enqueue(object : Callback<ApodEntry> {
             override fun onResponse(call: Call<ApodEntry>, response: Response<ApodEntry>) {
                 if (!response.isSuccessful)
                     return
@@ -105,16 +108,30 @@ class MainActivity : AppCompatActivity() {
         descriptionTextView.text = entry.explanation
 
         if (shouldLoadImages) {
-            Picasso.get().load(entry.url).into(pictureView, object : com.squareup.picasso.Callback {
-                override fun onSuccess() {
-                    pictureView.visibility = View.VISIBLE
-                    pictureLoader.visibility = View.GONE
-                }
+            if (entry.mediaType == MediaTypes.IMAGE) {
+                Picasso.get().load(entry.url).into(pictureView, object : com.squareup.picasso.Callback {
+                    override fun onSuccess() {
+                        pictureView.visibility = View.VISIBLE
+                        pictureLoader.visibility = View.GONE
+                    }
 
-                override fun onError(e: Exception?) {
+                    override fun onError(e: Exception?) {
 
-                }
-            })
+                    }
+                })
+            } else if (entry.mediaType == MediaTypes.VIDEO){
+                val videoName = Uri.parse(entry.url).lastPathSegment
+                Picasso.get().load(String.format(getString(R.string.youtube_thumbnail_base_url),videoName)).into(pictureView, object : com.squareup.picasso.Callback {
+                    override fun onSuccess() {
+                        pictureView.visibility = View.VISIBLE
+                        pictureLoader.visibility = View.GONE
+                    }
+
+                    override fun onError(e: Exception?) {
+
+                    }
+                })
+            }
         }
     }
 

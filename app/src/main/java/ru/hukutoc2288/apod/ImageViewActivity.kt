@@ -17,6 +17,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ShareCompat
 import com.squareup.picasso.Picasso
+import ru.hukutoc2288.apod.api.ApodEntry
 import ru.hukutoc2288.simplepermissionsdispatcher.SimpleNeverAskDialogFragment
 import ru.hukutoc2288.simplepermissionsdispatcher.SimplePermissionsDispatcher
 import ru.hukutoc2288.simplepermissionsdispatcher.SimpleRationaleDialogFragment
@@ -172,10 +173,6 @@ class ImageViewActivity : AppCompatActivity() {
                     }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
     }
 
     private fun toggle() {

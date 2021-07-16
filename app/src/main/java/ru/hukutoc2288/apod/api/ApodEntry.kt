@@ -1,12 +1,19 @@
-package ru.hukutoc2288.apod
+package ru.hukutoc2288.apod.api
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import java.util.*
 
 class ApodEntry(
-    val date: Date?, val copyright: String?, val explanation: String?, val hdurl: String?, val media_type: String?, val title: String?, val url: String?
-): Parcelable {
+    val date: Date?,
+    val copyright: String?,
+    val explanation: String?,
+    @SerializedName("hdurl") val hdUrl: String?,
+    @SerializedName("media_type") val mediaType: String?,
+    val title: String?,
+    val url: String?
+) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readSerializable() as Date,
         parcel.readString(),
@@ -21,8 +28,8 @@ class ApodEntry(
         parcel.writeSerializable(date)
         parcel.writeString(copyright)
         parcel.writeString(explanation)
-        parcel.writeString(hdurl)
-        parcel.writeString(media_type)
+        parcel.writeString(hdUrl)
+        parcel.writeString(mediaType)
         parcel.writeString(title)
         parcel.writeString(url)
     }

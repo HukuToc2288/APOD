@@ -1,4 +1,9 @@
 <resources>
+
+    <!--  Do NOT translate  -->
+    <string name="youtube_thumbnail_base_url">https://img.youtube.com/vi/%s/0.jpg</string>
+
+    <!--  DO translate  -->
     <string name="app_name">APOD</string>
     <string name="date_today">Today</string>
     <string name="title_activity_image_view">FullscreenActivity</string>
@@ -10,10 +15,7 @@
     <string name="permission_storage_dialog_title">Please grant storage permissions!</string>
     <string name="permission_storage_dialog_text">To be able to download pictures you must give storage permission
         on the next dialog as all downloaded pictures go to storage. APOD will never touch any other files in storage.</string>
-    <string name="permission_storage_dialog_confirm">Got it</string>
     <string name="permission_storage_never_again">You denied storage permission, so now pictures cannot be downloaded.
         If you want to download picture need to go to settings and allow storage permission manually.</string>
-    <string name="permissions_go_settings">Go to settings</string>
-    <string name="permissions_never_ask_dialog_confirm">I understand</string>
 
 </resources>
