@@ -46,17 +46,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        model = ViewModelProvider(this).get(MainModel::class.java)
+        initViews()
 
-        nestedScroll = findViewById(R.id.nested_scroll)
-        fab = findViewById(R.id.fab)
-        pictureView = findViewById(R.id.picture)
-        titleTextView = findViewById(R.id.title)
-        dateTextView = findViewById(R.id.date)
-        pictureLoader = findViewById(R.id.image_loader)
-        descriptionTextView = findViewById(R.id.description)
-        videoPlayButton = findViewById(R.id.youtube_play_button)
+        val savedEntry = savedInstanceState?.getParcelable<ApodEntry>(APOD_ENTRY_EXTRA_KEY)
+        savedEntry?.let { inflateViewsWithResponse(it) }
+
+        model = ViewModelProvider(this).get(MainModel::class.java)
         dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
         apodApi.getToday().enqueue(object : Callback<ApodEntry> {
             override fun onResponse(call: Call<ApodEntry>, response: Response<ApodEntry>) {
@@ -71,6 +66,18 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    private fun initViews() {
+        setContentView(R.layout.activity_main)
+        nestedScroll = findViewById(R.id.nested_scroll)
+        fab = findViewById(R.id.fab)
+        pictureView = findViewById(R.id.picture)
+        titleTextView = findViewById(R.id.title)
+        dateTextView = findViewById(R.id.date)
+        pictureLoader = findViewById(R.id.image_loader)
+        descriptionTextView = findViewById(R.id.description)
+        videoPlayButton = findViewById(R.id.youtube_play_button)
     }
 
     fun onFabClick(view: View) {
@@ -118,7 +125,7 @@ class MainActivity : AppCompatActivity() {
 
                     }
                 })
-            } else if (entry.mediaType == MediaTypes.VIDEO){
+            } else if (entry.mediaType == MediaTypes.VIDEO) {
                 val videoName = Uri.parse(entry.url).lastPathSegment
                 Picasso.get().load(String.format(getString(R.string.youtube_thumbnail_base_url), videoName)).into(
                     pictureView,
@@ -142,9 +149,17 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, ImageViewActivity::class.java)
             intent.putExtra(APOD_ENTRY_EXTRA_KEY, currentDisplayingEntry)
             startActivity(intent)
-        }else if (currentDisplayingEntry.mediaType == MediaTypes.VIDEO){
+        } else if (currentDisplayingEntry.mediaType == MediaTypes.VIDEO) {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(currentDisplayingEntry.url))
             startActivity(browserIntent)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.run {
+            putParcelable(APOD_ENTRY_EXTRA_KEY, currentDisplayingEntry)
+        }
+
+        super.onSaveInstanceState(outState)
     }
 }
