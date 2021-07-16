@@ -3,6 +3,7 @@ package ru.hukutoc2288.apod
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.FrameLayout
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity() {
     // for debugging purposes as internet connection is limited
     // 09.07.2021 huku
     private var shouldLoadImages = true
-    private lateinit var currentDisplayingEntry: ApodEntry
+    private var currentDisplayingEntry: ApodEntry? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,20 +58,27 @@ class MainActivity : AppCompatActivity() {
         pictureLoader = findViewById(R.id.image_loader)
         descriptionTextView = findViewById(R.id.description)
         videoPlayButton = findViewById(R.id.youtube_play_button)
+
         dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
-        apodApi.getToday().enqueue(object : Callback<ApodEntry> {
-            override fun onResponse(call: Call<ApodEntry>, response: Response<ApodEntry>) {
-                if (!response.isSuccessful)
-                    return
-                val entry = response.body()
-                inflateViewsWithResponse(entry)
-            }
 
-            override fun onFailure(call: Call<ApodEntry>?, t: Throwable) {
-                t.printStackTrace()
-            }
+        val savedEntry = savedInstanceState?.getParcelable<ApodEntry>(APOD_ENTRY_EXTRA_KEY)
+        if (savedEntry != null) {
+            inflateViewsWithResponse(savedEntry)
+        } else {
+            apodApi.getToday().enqueue(object : Callback<ApodEntry> {
+                override fun onResponse(call: Call<ApodEntry>, response: Response<ApodEntry>) {
+                    if (!response.isSuccessful)
+                        return
+                    val entry = response.body()
+                    inflateViewsWithResponse(entry)
+                }
 
-        })
+                override fun onFailure(call: Call<ApodEntry>?, t: Throwable) {
+                    t.printStackTrace()
+                }
+
+            })
+        }
     }
 
     fun onFabClick(view: View) {
@@ -118,7 +126,7 @@ class MainActivity : AppCompatActivity() {
 
                     }
                 })
-            } else if (entry.mediaType == MediaTypes.VIDEO){
+            } else if (entry.mediaType == MediaTypes.VIDEO) {
                 val videoName = Uri.parse(entry.url).lastPathSegment
                 Picasso.get().load(String.format(getString(R.string.youtube_thumbnail_base_url), videoName)).into(
                     pictureView,
@@ -138,13 +146,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onPictureClick(view: View) {
-        if (currentDisplayingEntry.mediaType == MediaTypes.IMAGE) {
-            val intent = Intent(this, ImageViewActivity::class.java)
-            intent.putExtra(APOD_ENTRY_EXTRA_KEY, currentDisplayingEntry)
-            startActivity(intent)
-        }else if (currentDisplayingEntry.mediaType == MediaTypes.VIDEO){
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(currentDisplayingEntry.url))
-            startActivity(browserIntent)
+        currentDisplayingEntry?.let {
+            if (it.mediaType == MediaTypes.IMAGE) {
+                val intent = Intent(this, ImageViewActivity::class.java)
+                intent.putExtra(APOD_ENTRY_EXTRA_KEY, currentDisplayingEntry)
+                startActivity(intent)
+            } else if (it.mediaType == MediaTypes.VIDEO) {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it.url))
+                startActivity(browserIntent)
+            }
         }
+
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.run {
+            putParcelable(APOD_ENTRY_EXTRA_KEY, currentDisplayingEntry)
+        }
+        super.onSaveInstanceState(outState)
     }
 }

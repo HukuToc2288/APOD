@@ -18,10 +18,13 @@
             >
         <activity
                 android:name=".ImageViewActivity"
-                android:label="@string/title_activity_image_view"
+                android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|touchscreen|uiMode"
                 >
         </activity>
-        <activity android:name=".MainActivity">
+        <activity
+                android:name=".MainActivity"
+                android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|touchscreen|uiMode"
+                >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
