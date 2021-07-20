@@ -3,6 +3,7 @@
     <color name="colorPrimary">#4b0082</color>
     <color name="colorPrimaryDark">#310062</color>
     <color name="colorAccent">#1e88e5</color>
+    <color name="color_fab_subbutton">#d81b60</color>
 
     <color name="black_overlay">#66000000</color>
 </resources>

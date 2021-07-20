@@ -111,14 +111,15 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.leinardi.android.speeddial.SpeedDialView
             android:id="@+id/fab"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:src="@android:drawable/ic_menu_add"
+            app:icon="@android:drawable/ic_menu_add"
             android:layout_margin="@dimen/fab_margin"
             android:layout_gravity="end|bottom"
             app:layout_behavior=".FabScrollBehavior"
-            android:onClick="onFabClick"
+            app:sdMainFabClosedSrc="@drawable/ic_fab_open"
+            app:sdMainFabOpenedSrc="@drawable/ic_fab_close"
             />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

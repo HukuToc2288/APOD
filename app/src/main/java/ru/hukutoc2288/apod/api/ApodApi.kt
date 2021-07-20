@@ -9,7 +9,7 @@ const val MEDIA_TYPE_VIDEO = "video"
 interface ApodApi {
 
     @GET("/planetary/apod")
-    fun getToday(@Query("api_key") apiKey: String=API_KEY, @Query("date") date: String?=null): Call<ApodEntry>
+    fun getByDate(@Query("api_key") apiKey: String=API_KEY, @Query("date") date: String?=null): Call<ApodEntry>
 
     @GET("/planetary/apod")
     fun getRandom(@Query("count") count: Int=1, @Query("api_key") apiKey: String= API_KEY): Call<List<ApodEntry>>

@@ -17,5 +17,8 @@
         on the next dialog as all downloaded pictures go to storage. APOD will never touch any other files in storage.</string>
     <string name="permission_storage_never_again">You denied storage permission, so now pictures cannot be downloaded.
         If you want to download picture need to go to settings and allow storage permission manually.</string>
+    <string name="action_today">Today</string>
+    <string name="action_random">Random</string>
+    <string name="action_by_date">By date</string>
 
 </resources>

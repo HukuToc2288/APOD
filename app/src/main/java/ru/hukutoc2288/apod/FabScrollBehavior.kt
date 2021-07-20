@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 fun getToolbarHeight(context: Context): Int {
     val styledAttributes = context.theme.obtainStyledAttributes(intArrayOf(R.attr.actionBarSize))
@@ -15,13 +14,13 @@ fun getToolbarHeight(context: Context): Int {
 }
 
 class FabScrollBehavior(context: Context, attrs: AttributeSet?) :
-    CoordinatorLayout.Behavior<FloatingActionButton>(context, attrs) {
+    CoordinatorLayout.Behavior<View>(context, attrs) {
     private val toolbarHeight: Int = getToolbarHeight(context)
-    override fun layoutDependsOn(parent: CoordinatorLayout, fab: FloatingActionButton, dependency: View): Boolean {
+    override fun layoutDependsOn(parent: CoordinatorLayout, fab: View, dependency: View): Boolean {
         return dependency is AppBarLayout
     }
 
-    override fun onDependentViewChanged(parent: CoordinatorLayout, fab: FloatingActionButton, dependency: View): Boolean {
+    override fun onDependentViewChanged(parent: CoordinatorLayout, fab: View, dependency: View): Boolean {
         if (dependency is AppBarLayout) {
             val lp = fab.layoutParams as CoordinatorLayout.LayoutParams
             val fabBottomMargin = lp.bottomMargin

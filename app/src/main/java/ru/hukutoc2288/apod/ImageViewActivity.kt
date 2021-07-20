@@ -34,7 +34,7 @@ class ImageViewActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
 
     private val humanDateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
-    private val urlDateFormat = SimpleDateFormat("yyMMdd", Locale.getDefault())
+    private val urlDateFormat = SimpleDateFormat("yyMMdd",Locale.ENGLISH)
     private lateinit var entry: ApodEntry
 
     private val hideHandler = Handler()
