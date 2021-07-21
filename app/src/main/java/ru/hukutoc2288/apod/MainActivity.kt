@@ -166,21 +166,21 @@ class MainActivity : AppCompatActivity() {
         // random
         // by date
         fab.addActionItem(
-            SpeedDialActionItem.Builder(1, R.drawable.ic_fab_today)
+            SpeedDialActionItem.Builder(R.id.fab_action_today, R.drawable.ic_fab_today)
                 .setFabBackgroundColor(getColor(R.color.color_fab_subbutton))
                 .setLabel(getString(R.string.action_today))
                 .setFabImageTintColor(Color.WHITE)
                 .create()
         )
         fab.addActionItem(
-            SpeedDialActionItem.Builder(2, R.drawable.ic_fab_random)
+            SpeedDialActionItem.Builder(R.id.fab_action_random, R.drawable.ic_fab_random)
                 .setFabBackgroundColor(getColor(R.color.color_fab_subbutton))
                 .setLabel(getString(R.string.action_random))
                 .setFabImageTintColor(Color.WHITE)
                 .create()
         )
         fab.addActionItem(
-            SpeedDialActionItem.Builder(3, R.drawable.ic_fab_date)
+            SpeedDialActionItem.Builder(R.id.fab_action_date, R.drawable.ic_fab_date)
                 .setFabBackgroundColor(getColor(R.color.color_fab_subbutton))
                 .setLabel(getString(R.string.action_by_date))
                 .setFabImageTintColor(Color.WHITE)
@@ -189,13 +189,13 @@ class MainActivity : AppCompatActivity() {
 
         fab.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
             when (actionItem.id) {
-                1 -> {
+                R.id.fab_action_today -> {
                     loadByDate()
                 }
-                2 -> {
+                R.id.fab_action_random -> {
                     loadRandom()
                 }
-                3 -> {
+                R.id.fab_action_date -> {
                     showDatePickerDialog()
                 }
             }

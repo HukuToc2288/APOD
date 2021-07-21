@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="fab_action_today" type="id"/>
+    <item name="fab_action_random" type="id"/>
+    <item name="fab_action_date" type="id"/>
+</resources>
