@@ -19,6 +19,7 @@ import androidx.core.app.ShareCompat
 import com.github.chrisbanes.photoview.PhotoView
 import com.squareup.picasso.Picasso
 import ru.hukutoc2288.apod.api.ApodEntry
+import ru.hukutoc2288.apod.databinding.ActivityImageViewBinding
 import ru.hukutoc2288.simplepermissionsdispatcher.SimpleNeverAskDialogFragment
 import ru.hukutoc2288.simplepermissionsdispatcher.SimplePermissionsDispatcher
 import ru.hukutoc2288.simplepermissionsdispatcher.SimpleRationaleDialogFragment
@@ -26,18 +27,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ImageViewActivity : AppCompatActivity() {
-    private lateinit var fullscreenContent: FrameLayout
-    private lateinit var fullscreenContentControls: ConstraintLayout
-    private lateinit var descriptionTextView: TextView
-    private lateinit var pictureView: PhotoView
-    private lateinit var pictureLoader: ProgressBar
-    private lateinit var toolbar: Toolbar
 
     private val humanDateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
     private val urlDateFormat = SimpleDateFormat("yyMMdd",Locale.ENGLISH)
     private lateinit var entry: ApodEntry
 
     private val hideHandler = Handler()
+
+    private lateinit var binding: ActivityImageViewBinding
 
     private val storagePermissionDispatcher =
         object : SimplePermissionsDispatcher(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
@@ -71,7 +68,7 @@ class ImageViewActivity : AppCompatActivity() {
         // Note that some of these constants are new as of API 16 (Jelly Bean)
         // and API 19 (KitKat). It is safe to use them, as they are inlined
         // at compile-time and do nothing on earlier devices.
-        fullscreenContent.systemUiVisibility =
+        binding.fullscreenContent.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LOW_PROFILE or
                     View.SYSTEM_UI_FLAG_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
@@ -82,7 +79,7 @@ class ImageViewActivity : AppCompatActivity() {
     private val showPart2Runnable = Runnable {
         // Delayed display of UI elements
         supportActionBar?.show()
-        fullscreenContentControls.visibility = View.VISIBLE
+        binding.fullscreenContentControls.visibility = View.VISIBLE
     }
     private var isFullscreen: Boolean = false
 
@@ -111,34 +108,27 @@ class ImageViewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_image_view)
+        binding = ActivityImageViewBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         isFullscreen = true
-
-        fullscreenContent = findViewById(R.id.fullscreen_content)
-        fullscreenContentControls = findViewById(R.id.fullscreen_content_controls)
-        descriptionTextView = findViewById(R.id.description)
-        pictureView = findViewById(R.id.picture)
-        pictureLoader = findViewById(R.id.image_loader)
-        toolbar = findViewById(R.id.toolbar)
-
-        setSupportActionBar(toolbar)
-        pictureView.setOnClickListener {
+        
+        setSupportActionBar(binding.toolbar)
+        binding.picture.setOnClickListener {
             toggle()
         }
         entry = intent.getParcelableExtra<ApodEntry>(APOD_ENTRY_EXTRA_KEY)!!
         //val titleString = if (entry.title != null) entry.title + "\n" else ""
         val dateString = if (entry.date != null) humanDateFormat.format(entry.date!!) + "\n" else ""
         val copyrightString = entry.copyright ?: ""
-        descriptionTextView.text = dateString + copyrightString
+        binding.description.text = dateString + copyrightString
         supportActionBar?.title = entry.title
 
-        Picasso.get().load(entry.url).into(pictureView, object : com.squareup.picasso.Callback {
+        Picasso.get().load(entry.url).into(binding.picture, object : com.squareup.picasso.Callback {
             override fun onSuccess() {
-                pictureView.visibility = View.VISIBLE
-                pictureLoader.visibility = View.GONE
+                binding.picture.visibility = View.VISIBLE
+                binding.pictureLoader.visibility = View.GONE
                 delayedHide(1000)
             }
 
@@ -187,7 +177,7 @@ class ImageViewActivity : AppCompatActivity() {
     private fun hide() {
         // Hide UI first
         supportActionBar?.hide()
-        fullscreenContentControls.visibility = View.GONE
+        binding.fullscreenContentControls.visibility = View.GONE
         isFullscreen = false
 
         // Schedule a runnable to remove the status and navigation bar after a delay
@@ -197,7 +187,7 @@ class ImageViewActivity : AppCompatActivity() {
 
     private fun show() {
         // Show the system bar
-        fullscreenContent.systemUiVisibility =
+        binding.fullscreenContent.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
         isFullscreen = true

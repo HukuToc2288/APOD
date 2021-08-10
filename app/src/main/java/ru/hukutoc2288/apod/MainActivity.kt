@@ -6,16 +6,9 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateUtils
-import android.text.method.DateTimeKeyListener
 import android.util.Log
 import android.view.View
-import android.widget.DatePicker
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
@@ -25,25 +18,17 @@ import retrofit2.Callback
 import retrofit2.Response
 import ru.hukutoc2288.apod.api.ApodEntry
 import ru.hukutoc2288.apod.api.MediaTypes
+import ru.hukutoc2288.apod.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.*
 
 const val APOD_ENTRY_EXTRA_KEY = "apodEntryKey"
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var fab: SpeedDialView
-    private lateinit var nestedScroll: NestedScrollView
-    private lateinit var pictureView: ImageView
-    private lateinit var videoPlayButton: ImageView
-    private lateinit var titleTextView: TextView
-    private lateinit var dateTextView: TextView
+
     private lateinit var model: MainModel
-    private lateinit var pictureLoader: ProgressBar
-    private lateinit var descriptionTextView: TextView
     private lateinit var dateFormat: SimpleDateFormat
-    private lateinit var toolbar: Toolbar
 
     private val apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
 
@@ -52,19 +37,14 @@ class MainActivity : AppCompatActivity() {
     private var shouldLoadImages = true
     private var currentDisplayingEntry: ApodEntry? = null
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        model = ViewModelProvider(this).get(MainModel::class.java)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        nestedScroll = findViewById(R.id.nested_scroll)
-        fab = findViewById(R.id.fab)
-        pictureView = findViewById(R.id.picture)
-        titleTextView = findViewById(R.id.title)
-        dateTextView = findViewById(R.id.date)
-        pictureLoader = findViewById(R.id.image_loader)
-        descriptionTextView = findViewById(R.id.description)
-        videoPlayButton = findViewById(R.id.youtube_play_button)
+        model = ViewModelProvider(this).get(MainModel::class.java)
 
         dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
 
@@ -97,24 +77,24 @@ class MainActivity : AppCompatActivity() {
     fun inflateViewsWithResponse(entry: ApodEntry) {
         currentDisplayingEntry = entry
         if (entry.date == null) {
-            dateTextView.text = ""
+            binding.date.text = ""
         } else {
             if (DateUtils.isToday(entry.date.time)) {
-                dateTextView.text = getString(R.string.date_today)
+                binding.date.text = getString(R.string.date_today)
             } else {
-                dateTextView.text = dateFormat.format(entry.date)
+                binding.date.text = dateFormat.format(entry.date)
             }
         }
-        descriptionTextView.visibility = View.VISIBLE
-        titleTextView.text = entry.title
-        descriptionTextView.text = entry.explanation
+        binding.description.visibility = View.VISIBLE
+        binding.title.text = entry.title
+        binding.description.text = entry.explanation
 
         if (shouldLoadImages) {
             if (entry.mediaType == MediaTypes.IMAGE) {
-                Picasso.get().load(entry.url).into(pictureView, object : com.squareup.picasso.Callback {
+                Picasso.get().load(entry.url).into(binding.picture, object : com.squareup.picasso.Callback {
                     override fun onSuccess() {
-                        pictureView.visibility = View.VISIBLE
-                        pictureLoader.visibility = View.GONE
+                        binding.picture.visibility = View.VISIBLE
+                        binding.pictureLoader.visibility = View.GONE
                     }
 
                     override fun onError(e: Exception?) {
@@ -124,12 +104,12 @@ class MainActivity : AppCompatActivity() {
             } else if (entry.mediaType == MediaTypes.VIDEO) {
                 val videoName = Uri.parse(entry.url).lastPathSegment
                 Picasso.get().load(String.format(getString(R.string.youtube_thumbnail_base_url), videoName)).into(
-                    pictureView,
+                    binding.picture,
                     object : com.squareup.picasso.Callback {
                         override fun onSuccess() {
-                            pictureView.visibility = View.VISIBLE
-                            pictureLoader.visibility = View.GONE
-                            videoPlayButton.visibility = View.VISIBLE
+                            binding.picture.visibility = View.VISIBLE
+                            binding.pictureLoader.visibility = View.GONE
+                            binding.youtubePlayButton.visibility = View.VISIBLE
                         }
 
                         override fun onError(e: Exception?) {
@@ -165,21 +145,21 @@ class MainActivity : AppCompatActivity() {
         // today
         // random
         // by date
-        fab.addActionItem(
+        binding.fab.addActionItem(
             SpeedDialActionItem.Builder(R.id.fab_action_today, R.drawable.ic_fab_today)
                 .setFabBackgroundColor(getColor(R.color.color_fab_subbutton))
                 .setLabel(getString(R.string.action_today))
                 .setFabImageTintColor(Color.WHITE)
                 .create()
         )
-        fab.addActionItem(
+        binding.fab.addActionItem(
             SpeedDialActionItem.Builder(R.id.fab_action_random, R.drawable.ic_fab_random)
                 .setFabBackgroundColor(getColor(R.color.color_fab_subbutton))
                 .setLabel(getString(R.string.action_random))
                 .setFabImageTintColor(Color.WHITE)
                 .create()
         )
-        fab.addActionItem(
+        binding.fab.addActionItem(
             SpeedDialActionItem.Builder(R.id.fab_action_date, R.drawable.ic_fab_date)
                 .setFabBackgroundColor(getColor(R.color.color_fab_subbutton))
                 .setLabel(getString(R.string.action_by_date))
@@ -187,7 +167,7 @@ class MainActivity : AppCompatActivity() {
                 .create()
         )
 
-        fab.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
+        binding.fab.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
             when (actionItem.id) {
                 R.id.fab_action_today -> {
                     loadByDate()
@@ -200,16 +180,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            fab.close() // To close the Speed Dial with animation
+            binding.fab.close() // To close the Speed Dial with animation
             return@OnActionSelectedListener true // false will close it without animation
         })
     }
 
     fun loadByDate(date: String? = null) {
-        pictureView.visibility = View.GONE
-        videoPlayButton.visibility = View.GONE
-        pictureLoader.visibility = View.VISIBLE
-        descriptionTextView.visibility = View.GONE
+        binding.picture.visibility = View.GONE
+        binding.youtubePlayButton.visibility = View.GONE
+        binding.pictureLoader.visibility = View.VISIBLE
+        binding.description.visibility = View.GONE
         apodApi.getByDate(date = date).enqueue(object : Callback<ApodEntry> {
             override fun onResponse(call: Call<ApodEntry>, response: Response<ApodEntry>) {
                 if (!response.isSuccessful)
@@ -226,10 +206,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loadRandom() {
-        pictureView.visibility = View.GONE
-        videoPlayButton.visibility = View.GONE
-        pictureLoader.visibility = View.VISIBLE
-        descriptionTextView.visibility = View.GONE
+        binding.picture.visibility = View.GONE
+        binding.youtubePlayButton.visibility = View.GONE
+        binding.pictureLoader.visibility = View.VISIBLE
+        binding.description.visibility = View.GONE
         apodApi.getRandom().enqueue(object : Callback<List<ApodEntry>> {
             override fun onResponse(call: Call<List<ApodEntry>>, response: Response<List<ApodEntry>>) {
                 if (!response.isSuccessful)
